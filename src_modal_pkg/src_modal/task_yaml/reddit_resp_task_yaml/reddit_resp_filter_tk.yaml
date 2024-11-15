@@ -1,0 +1,20 @@
+content_filter_task:
+  description: >
+    Review the comment with ID {comment_id} to decide if it's relevant to {domain} and {product_name}.
+    - Determine if the comment seeks info, advice, or suggestions related to {product_name}. If so, mark it as relevant.
+      Example: "I think it would be better to have something on the wall."
+    - Comments with URLs that appear like bots (e.g., "Check this: https://www.example.com") are irrelevant.
+    - Short comments (under 15 words) that aren't questions, requests, or suggestions are irrelevant.
+    - Very short comments (under 7 words) should be discarded (e.g., "Yes", "I dig it").
+    - Positive remarks without follow-up questions or requests are irrelevant (e.g., "THATS WILD!!!!!").
+    - Statements without questions, requests, or suggestions are irrelevant (e.g., "The lighting looks perfect.").
+    - Comments discussing things outside {product_name}'s capabilities (e.g., "Where can I buy this?") are irrelevant.   
+    - Comments merely praising someone's work or product, but not mentioning {product_name} are irrelevant. 
+    - Offensive comments or those with foul language are irrelevant.
+    - If relevant, set 'decision' to 'relevant' in JSON output; otherwise, 'discard'.
+    - Comment data available in {input_data}.
+    - Description of {product_name} is : {product_long}
+  expected_out: >
+    - Decision: 'relevant' or 'discard'.
+    - Justification: Brief explanation (max 15 words) of the decision. Focus on why it's relevant or not 
+    (e.g., "No request or suggestion found," "Comment too old").

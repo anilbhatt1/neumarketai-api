@@ -1,0 +1,12 @@
+api_keys.json
+*.pem
+**/__pycache__/
+.ipynb_checkpoints
+*.db
+env/
+venv/
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python

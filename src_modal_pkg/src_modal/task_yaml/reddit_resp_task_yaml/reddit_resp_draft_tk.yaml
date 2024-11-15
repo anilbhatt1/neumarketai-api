@@ -1,0 +1,20 @@
+response_drafting_task:
+  description: >
+    -{comment_id}: ID of the comment to respond to.
+    -You will get context about the comment.
+    -Comments are suggestions, advice, or follow-up questions.
+    -Read comments carefully to identify their type.
+    -Draft a response that fits the comment type and stays in line with the discussion.
+    -Keep the response casual, friendly, and genuine.
+    -Avoid including any new information not in the original comment.
+    -Start naturally; don't begin with marketing.
+    -Add short, natural marketing text (under 30-35 words) within the response.
+    -Marketing text should align with the {product_name}'s real capabilities.
+    -Don't take credit for praise not directed at {product_name}.
+    -Keep the total response under 90 words.
+    -The response is to be drafted for the original comment: {input_data}.
+    -The context for this comment is: {context}.
+    -Description and capabilities of {product_name}: {product_long}
+    -Website of product is {product_url}   
+  expected_out: >
+    A well crafted response of less than 90 words with a short marketing message gently inserted between

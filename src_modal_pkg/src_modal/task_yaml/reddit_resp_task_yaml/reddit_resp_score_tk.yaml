@@ -1,0 +1,26 @@
+content_scoring_task:
+  description: >
+    Review the comment {comment_id} and assign a score (1-10) on the likelihood of successful marketing for {product_name}.
+    - Analyze relevance to {domain} and how well it aligns with {product_name}'s features.
+    - Scoring scale:
+      - 0-3.9: Poor - Not useful for marketing.
+      - 4-6.9: Average - Some useful points but not ideal.
+      - 7-8.9: Good - Suitable for a marketing pitch.
+      - 9-10: Excellent - Perfect for marketing purposes.
+    - Consider the following when scoring:
+      - High score (7-10): Comments asking for help, advice, or guidance related to {product_name}'s capabilities.
+        Example: "I want to change my home's style but don't know where to start."
+      - Low score (0-3.9): Comments unrelated to {product_name}'s capabilities, such as inquiries about buying items.
+        Example: "Where did you get that lamp?"
+      - Average score (4-6.9): 
+        - Comments over {age} year old or have mixed relevance.
+        - Comments praising someone's work or product, but not mentioning {product_name}
+          Example: "The app you developed looks great."
+    - Include context from {input_data} for better scoring accuracy.
+    - Use the description provided for {product_name} to understand the marketing fit.
+    - Consider if a reply could attract readers to learn more about {product_name}.
+    - Description and capabilities of {product_name}: {product_long}   
+  expected_out: >
+    - Score (1-10).
+    - Justification: Short explanation (max 15 words) of the score based on comment relevance and marketing potential 
+    (e.g., "Relevant question for product capabilities," "Too old for engagement").
