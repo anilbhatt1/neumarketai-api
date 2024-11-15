@@ -13,7 +13,7 @@ with modal_image.imports():
 #**********************************#
 app = App('neumarketai-kwgen', image=modal_image) 
  
-@app.function(timeout=20, secrets=[modal.Secret.from_name("my-openai-secret")])
+@app.function(timeout=30, secrets=[modal.Secret.from_name("my-openai-secret")])
 @web_endpoint(method="POST")
 def kwgen(item: dict):
     response = handle_main_response(item) 

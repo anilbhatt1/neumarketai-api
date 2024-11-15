@@ -14,9 +14,9 @@ from crewai import Agent, Task, Crew, Process
 from textwrap import dedent 
 from pydantic import BaseModel
 from datetime import datetime
-from src_modal.gen_config import config
-from src_modal.util.reddit_resp_format import *
-from src_modal.util.reddit_resp_db_util import fetch_db_record
+from reddit_scan.gen_config import config
+from reddit_scan.util.reddit_resp_format import *
+from reddit_scan.util.reddit_resp_db_util import fetch_db_record
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -41,12 +41,11 @@ class ScoreOutput(BaseModel):
 def reddit_resp_score(relevant_comment_id_dict):
     
     product_long = config.in_data['product_long_description']
-    product_short = config.in_data['product_short_description']
     product_name = config.in_data['product_name']
     domain = config.in_data['domain']
-    age_limit = config.in_data['age_limit'] 
-    thresh_score_for_response = config.in_data['thresh_score_for_response'] 
-    pct_of_comments = config.in_data['pct_of_comments']      
+    age_limit = config.age_limit 
+    thresh_score_for_response = config.thresh_score_for_response
+    pct_of_comments = config.pct_of_comments
     user_id = config.in_data['user_id']
    
     backstory = agent_cfg_data['content_scoring_analyst']['backstory'] 
@@ -118,7 +117,6 @@ def reddit_resp_score(relevant_comment_id_dict):
             input_dict = {"comment_id": comm_id,
                           "input_data": data_details,
                           "product_long": product_long,
-                          "product_short": product_short,
                           "domain": domain,
                           "age": age_limit,
                           "product_name": product_name}        
@@ -215,7 +213,5 @@ def reddit_resp_score(relevant_comment_id_dict):
         comment_ids_dict_for_response[comm_id] = keycombo
     
     processed_comments_ids = list(relevant_comment_id_dict.keys())    
-    # output_file_path = os.path.join(current_dir, '..', '..','outputfiles', 'score_out.txt') 
-    # out_lst = reddit_resp_prep_csv_output(processed_comments_ids, 'score', config.comment_dict_copy, output_file_path)
     
     return comment_ids_dict_for_response, db_update_list    

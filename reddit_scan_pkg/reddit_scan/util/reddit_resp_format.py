@@ -6,7 +6,7 @@ import ast
 import praw
 import copy
 from datetime import datetime, timedelta
-from src_modal.gen_config import config
+from reddit_scan.gen_config import config
 
 print(f'reddit_resp_format.py')
 

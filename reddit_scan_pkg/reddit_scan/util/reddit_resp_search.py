@@ -7,8 +7,8 @@ import json
 import praw
 import copy
 from datetime import datetime, timedelta, timezone
-from src_modal.util.reddit_resp_format import reddit_resp_get_calendar_date
-from src_modal.gen_config import config
+from reddit_scan.util.reddit_resp_format import reddit_resp_get_calendar_date
+from reddit_scan.gen_config import config
 
 print(f'reddit_resp_search.py')
 
@@ -33,8 +33,8 @@ def search_posts(subreddit_name, keyword, reddit_num, reddit_read_count): #, red
     post_ids = []
 
     subreddit = config.reddit_list[reddit_num].subreddit(subreddit_name)
-    reddit_read_limit = config.in_data['reddit_read_limit'][0]
-    reddit_time_filter = config.in_data['reddit_time_filter']
+    reddit_read_limit = config.reddit_read_limit[0]
+    reddit_time_filter = config.reddit_time_filter
     
     for post in subreddit.search(keyword, sort='new', time_filter=reddit_time_filter, limit=reddit_read_limit):
         age = calculate_comment_age(post.created_utc)
@@ -117,10 +117,10 @@ def reddit_resp_search(search_keywords):
     
     print(f'***reddit_resp_search started***')
     print(f'search_keywords : {len(search_keywords)} - {search_keywords}')
-    print(f'reddit_comment_limit set in config : {config.in_data["reddit_comment_limit"]}')
-    print(f'reddit_read_limit set in config : {config.in_data["reddit_read_limit"][0]}')
-    print(f'reddit_time_filter set in config : {config.in_data["reddit_time_filter"]}')
-    print(f'reddit_switch_limit set in config : {config.in_data["reddit_switch_limit"]}')    
+    print(f'reddit_comment_limit set in config : {config.reddit_comment_limit}')
+    print(f'reddit_read_limit set in config : {config.reddit_read_limit[0]}')
+    print(f'reddit_time_filter set in config : {config.reddit_time_filter}')
+    print(f'reddit_switch_limit set in config : {config.reddit_switch_limit}')    
     found_subreddits = [search_for_subreddits(keyword) for keyword in search_keywords]
     all_subreddits = []
     for each in found_subreddits:
@@ -353,15 +353,15 @@ def select_within_limit(sorted_comments, limit, window_hours=6):
 def process_condensed_data(condensed_data):
     all_comments = flatten_condensed_data(condensed_data)  # Step 1
     sorted_comments = sort_by_created_dt(all_comments)     # Step 2
-    reddit_comment_limit = config.in_data['reddit_comment_limit']
+    reddit_comment_limit = config.reddit_comment_limit
     trimmed_comments, latest_dt, oldest_dt = select_within_limit(sorted_comments, reddit_comment_limit)  # Step 3
     config.latest_time_str = latest_dt
     config.oldest_time_str = oldest_dt
     print(f'Reddit Time window to consider: {config.latest_time_str} till {config.oldest_time_str}')
     print(f'reddit_comment_limit set in config : {reddit_comment_limit}')
-    print(f'reddit_read_limit set in config : {config.in_data["reddit_read_limit"][0]}')
-    print(f'reddit_time_filter set in config : {config.in_data["reddit_time_filter"]}')
-    print(f'reddit_switch_limit set in config : {config.in_data["reddit_switch_limit"]}') 
+    print(f'reddit_read_limit set in config : {config.reddit_read_limit[0]}')
+    print(f'reddit_time_filter set in config : {config.reddit_time_filter}')
+    print(f'reddit_switch_limit set in config : {config.reddit_switch_limit}') 
     print(f'Number of comments within time window: {len(trimmed_comments)}')
     print(f'Number of comments to discard : {len(all_comments) - len(trimmed_comments)}')
     

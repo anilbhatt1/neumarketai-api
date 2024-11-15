@@ -14,9 +14,9 @@ from crewai import Agent, Task, Crew, Process
 from textwrap import dedent 
 from pydantic import BaseModel
 from datetime import datetime
-from src_modal.gen_config import config
-from src_modal.util.reddit_resp_format import *
-from src_modal.util.reddit_resp_db_util import fetch_db_record
+from reddit_scan.gen_config import config
+from reddit_scan.util.reddit_resp_format import *
+from reddit_scan.util.reddit_resp_db_util import fetch_db_record
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -53,7 +53,6 @@ class DecisionOutput(BaseModel):
 def reddit_resp_filter(condensed_reddit_data):
     
     product_long = config.in_data['product_long_description']
-    product_short = config.in_data['product_short_description']
     product_name = config.in_data['product_name']
     oldest_time_str = config.oldest_time_str
     latest_time_str = config.latest_time_str
@@ -149,7 +148,6 @@ def reddit_resp_filter(condensed_reddit_data):
                     input_dict = {"comment_id": comm_id,
                                   "input_data": comment_text,
                                   "product_long": product_long,
-                                  "product_short": product_short,
                                   "product_name": product_name,
                                   "domain": domain}
                     decision_result = filter_crew.kickoff(inputs=input_dict)
@@ -217,8 +215,4 @@ def reddit_resp_filter(condensed_reddit_data):
     print(f'Newly filtered by AI now : {len(db_update_list)} / {tot_cnt}')
     print(f'Processed : {len(decision_id_lst)} == {filter_cnt} Old : {len(old_comments_id_lst)} Tot:{tot_cnt}') 
 
-    #output_file_path = os.path.join(current_dir, '..', '..','outputfiles', 'decision_out.txt')  
-   
-    #out_lst = reddit_resp_prep_csv_output(decision_id_lst, 'filter', config.comment_dict_copy, output_file_path) 
-    
     return relevant_comment_id_dict, db_update_list

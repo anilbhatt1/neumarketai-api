@@ -3,9 +3,8 @@ logging.basicConfig(level=logging.WARNING)  # Change to DEBUG for more detailed 
 logger = logging.getLogger(__name__)
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 
-import sqlite3
 import os
-from src_modal.gen_config import config
+from reddit_scan.gen_config import config
 from datetime import datetime
 import json
 import psycopg2
@@ -32,7 +31,6 @@ def get_db_connection():
             password=os.getenv('AWS_DB_PASSWORD'),
             port=os.getenv('AWS_DB_PORT')
         )
-        print(f"Successfully connected to DB - {os.getenv('DB_HOST')}")
         return connection
     except Exception as e:
         print(f"Error connecting to the database: {e}")
@@ -42,16 +40,16 @@ def init_db_and_table():
     
     conn = get_db_connection()
     cursor = conn.cursor()
+    
+    config.table_name = config.in_data['user_id'] + '_' + config.in_data['request_type']
 
-    # Check if the table exists & CREATE if it doesn't
-    table_name = config.in_data['user_id']
+    # Check if the table exists & CREATE if it doesn't    
     create_table_query = f'''
-    CREATE TABLE IF NOT EXISTS '{table_name}' (
+    CREATE TABLE IF NOT EXISTS {config.table_name} (
         comment_userid_keycombo TEXT PRIMARY KEY,
         phase TEXT,
         meta_details TEXT,
-        created_at TEXT,
-        updated_at TEXT
+        created_at TEXT
     );
     '''    
 
@@ -59,7 +57,7 @@ def init_db_and_table():
     conn.commit()
     cursor.close()
     conn.close()
-    out_str = f'Init DB and Table - {config.db_path}-{config.table_name} - Success'
+    out_str = f'Init DB and Table - {os.getenv("AWS_DB_NAME")}-{config.table_name} - Success'
     
     return out_str 
 
@@ -76,7 +74,7 @@ def insert_update_db_records(input_list):
             update_status = update_db_record(input_dict) 
             update_cnt += update_status['count']
             
-    output_status = f'{os.getenv('AWS_DB_NAME')}-{config.table_name}- Insert: {insert_cnt} Updt: {update_cnt} Tot: {len(input_list)}'
+    output_status = f'{os.getenv("AWS_DB_NAME")}-{config.table_name}- Insert: {insert_cnt} Updt: {update_cnt} Tot: {len(input_list)}'
     return output_status 
 
 # Function to insert records
@@ -91,7 +89,7 @@ def insert_db_record(input_dict):
     
     insert_query = f'''
     INSERT INTO {config.table_name} (comment_userid_keycombo, phase, meta_details, created_at)
-    VALUES (%s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s)
     ON CONFLICT (comment_userid_keycombo) DO NOTHING;
     '''
     values = (comment_userid_keycombo, phase, meta_details_json, created_at)    
@@ -110,7 +108,7 @@ def insert_db_record(input_dict):
         
     return insert_status
    
-def update_db_record(input_dict, conn, cursor):   
+def update_db_record(input_dict):   
         
     comment_userid_keycombo = input_dict['comment_userid_keycombo']
     input_phase = input_dict['phase']
@@ -149,7 +147,9 @@ def update_db_record(input_dict, conn, cursor):
                             WHERE comment_userid_keycombo = %s;
                             '''
             values = (meta_details_json, comment_userid_keycombo)               
-            cursor.execute(update_query, values)     
+            cursor.execute(update_query, values)
+            conn.commit()
+            update_status = {"status": "success", "message": "Record updated successfully", "count": 1}    
         else:
             update_query = f'''
                             UPDATE {config.table_name}
@@ -158,6 +158,7 @@ def update_db_record(input_dict, conn, cursor):
                             '''
             values = (meta_details_json, input_phase, comment_userid_keycombo)               
             cursor.execute(update_query, values)
+            conn.commit()
             update_status = {"status": "success", "message": "Record updated successfully", "count": 1}            
     except Exception as e:
         print(f'{comment_userid_keycombo} - Update Failed - {str(e)}')
@@ -231,7 +232,7 @@ def delete_db_record(input_dict):
     
     comment_userid_keycombo = input_dict['comment_userid_keycombo']
 
-    delete_query = "DELETE FROM {config.table_name} WHERE comment_userid_keycombo = %s;"
+    delete_query = f"DELETE FROM {config.table_name} WHERE comment_userid_keycombo = %s;"
     
     try:
         cursor.execute(delete_query, (comment_userid_keycombo,))
