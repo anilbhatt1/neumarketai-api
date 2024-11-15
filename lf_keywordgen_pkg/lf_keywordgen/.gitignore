@@ -1,0 +1,10 @@
+.env
+api_keys.json
+*.json
+*.txt
+*.pem
+**/__pycache__/
+.ipynb_checkpoints
+*.db
+aws/
+awscliv2.zip
